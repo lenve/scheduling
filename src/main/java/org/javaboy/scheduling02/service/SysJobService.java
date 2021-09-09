@@ -25,4 +25,9 @@ public class SysJobService {
     public List<SysJob> getAllJobs() {
         return sysJobRepository.findAll();
     }
+
+    public Boolean addJob(SysJob sysJob) {
+
+        return null;
+    }
 }

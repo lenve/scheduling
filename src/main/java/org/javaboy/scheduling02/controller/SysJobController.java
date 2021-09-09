@@ -1,9 +1,11 @@
 package org.javaboy.scheduling02.controller;
 
+import org.javaboy.scheduling02.model.RespBean;
 import org.javaboy.scheduling02.model.SysJob;
 import org.javaboy.scheduling02.service.SysJobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,5 +28,13 @@ public class SysJobController {
     @GetMapping("/")
     public List<SysJob> getAllJobs() {
         return sysJobService.getAllJobs();
+    }
+
+    public RespBean addJob(@RequestBody SysJob sysJob) {
+        Boolean flag = sysJobService.addJob(sysJob);
+        if (flag) {
+            return RespBean.ok("作业添加成功");
+        }
+        return RespBean.error("作业添加失败");
     }
 }
