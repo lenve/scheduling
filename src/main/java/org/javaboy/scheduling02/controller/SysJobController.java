@@ -4,10 +4,7 @@ import org.javaboy.scheduling02.model.RespBean;
 import org.javaboy.scheduling02.model.SysJob;
 import org.javaboy.scheduling02.service.SysJobService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,11 +27,30 @@ public class SysJobController {
         return sysJobService.getAllJobs();
     }
 
+    @PostMapping("/")
     public RespBean addJob(@RequestBody SysJob sysJob) {
         Boolean flag = sysJobService.addJob(sysJob);
         if (flag) {
             return RespBean.ok("作业添加成功");
         }
-        return RespBean.error("作业添加失败");
+        return RespBean.error("作业重复，添加失败");
+    }
+
+    @PutMapping("/")
+    public RespBean updateJob(@RequestBody SysJob sysJob) {
+        Boolean flag = sysJobService.updateJob(sysJob);
+        if (flag) {
+            return RespBean.ok("作业更新成功");
+        }
+        return RespBean.error("作业更新失败");
+    }
+
+    @DeleteMapping("/")
+    public RespBean deleteJobs(Integer id) {
+        Boolean flag = sysJobService.deleteJobsById(id);
+        if (flag) {
+            return RespBean.ok("删除成功");
+        }
+        return RespBean.error("删除失败");
     }
 }
