@@ -44,14 +44,14 @@
         <el-table-column prop="updateTime" label="更新时间"></el-table-column>
         <el-table-column label="操作" width="200px">
             <template slot-scope="scope">
-                <el-button type="primary" size="mini">作业编辑</el-button>
+                <el-button type="primary" size="mini" @click="showUpdateTaskView(scope.row)">作业编辑</el-button>
                 <el-button type="danger" size="mini" @click="deleteTask(scope.row)">作业删除</el-button>
             </template>
         </el-table-column>
     </el-table>
     <el-button size="mini" icon="el-icon-plus" type="success" @click="showEditTaskView">添加作业</el-button>
     <el-dialog
-            title="提示"
+            :title="dialogTitle"
             size="mini"
             :visible.sync="dialogVisible"
             width="30%">
@@ -90,6 +90,7 @@
         data: {
             jobs: [],
             dialogVisible: false,
+            dialogTitle: '添加作业',
             job: {
                 beanName: '',
                 methodName: '',
@@ -138,10 +139,26 @@
                         });
                         this.dialogVisible = false;
                         this.initJobs();
+                        this.resetJob();
                     }
                 })
             },
+            resetJob() {
+                this.job = {
+                    beanName: '',
+                    methodName: '',
+                    methodParams: '',
+                    cronExpression: '',
+                    jobStatus: 1,
+                    remark: ''
+                };
+            },
             commitData() {
+                if (this.job.jobId) {
+                    //更新
+                    this.updateJob();
+                    return;
+                }
                 axios.post("/jobs/",this.job).then(resp=>{
                     if (resp.status == 200) {
                         this.$notify({
@@ -151,10 +168,17 @@
                         });
                         this.dialogVisible = false;
                         this.initJobs();
+                        this.resetJob();
                     }
-                })
+                });
             },
             showEditTaskView() {
+                this.dialogTitle = '添加作业';
+                this.dialogVisible = true;
+            },
+            showUpdateTaskView(data) {
+                this.dialogTitle = '修改作业';
+                Object.assign(this.job, data);
                 this.dialogVisible = true;
             },
             initJobs() {
