@@ -27,6 +27,10 @@ public class SchedulingRunnable implements Runnable {
 
     private String params;
 
+    private Object targetBean;
+
+    private Method method;
+
     public SchedulingRunnable(String beanName, String methodName) {
         this(beanName, methodName, null);
     }
@@ -35,6 +39,23 @@ public class SchedulingRunnable implements Runnable {
         this.beanName = beanName;
         this.methodName = methodName;
         this.params = params;
+        init();
+    }
+
+    private void init() {
+        try {
+            targetBean = SpringContextUtils.getBean(beanName);
+
+            if (StringUtils.hasText(params)) {
+                method = targetBean.getClass().getDeclaredMethod(methodName, String.class);
+            } else {
+                method = targetBean.getClass().getDeclaredMethod(methodName);
+            }
+
+            ReflectionUtils.makeAccessible(method);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -43,20 +64,10 @@ public class SchedulingRunnable implements Runnable {
         long startTime = System.currentTimeMillis();
 
         try {
-            Object target = SpringContextUtils.getBean(beanName);
-
-            Method method = null;
             if (StringUtils.hasText(params)) {
-                method = target.getClass().getDeclaredMethod(methodName, String.class);
+                method.invoke(targetBean, params);
             } else {
-                method = target.getClass().getDeclaredMethod(methodName);
-            }
-
-            ReflectionUtils.makeAccessible(method);
-            if (StringUtils.hasText(params)) {
-                method.invoke(target, params);
-            } else {
-                method.invoke(target);
+                method.invoke(targetBean);
             }
         } catch (Exception ex) {
             logger.error(String.format("定时任务执行异常 - bean：%s，方法：%s，参数：%s ", beanName, methodName, params), ex);
