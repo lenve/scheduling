@@ -57,16 +57,16 @@
             width="30%">
         <div>
             <el-form ref="form" label-width="140px" size="mini">
-                <el-form-item label="Bean名称">
+                <el-form-item label="Bean名称" required>
                     <el-input v-model="job.beanName"></el-input>
                 </el-form-item>
-                <el-form-item label="方法名称">
+                <el-form-item label="方法名称" required>
                     <el-input v-model="job.methodName"></el-input>
                 </el-form-item>
                 <el-form-item label="方法参数">
                     <el-input v-model="job.methodParams"></el-input>
                 </el-form-item>
-                <el-form-item label="Cron表达式">
+                <el-form-item label="Cron表达式" required>
                     <el-input v-model="job.cronExpression"></el-input>
                 </el-form-item>
                 <el-form-item label="作业状态">
@@ -154,6 +154,10 @@
                 };
             },
             commitData() {
+                if (!this.job.beanName || !this.job.cronExpression || !this.job.methodName) {
+                    this.$message.error('带 * 表示必填字段！');
+                    return;
+                }
                 if (this.job.jobId) {
                     //更新
                     this.updateJob();
